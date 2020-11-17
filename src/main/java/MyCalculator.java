@@ -47,6 +47,17 @@ public class MyCalculator {
     }
 
     /**
+     *
+     * @param ch 运算符
+     * @return 优先级
+     */
+    private static int getPriority(char ch) {
+        if (ch == '+' || ch == '-')
+            return 1;
+        else return 2;
+    }
+
+    /**
      * @param a 左操作数
      * @param b 右操作数
      * @param x 运算符
@@ -79,18 +90,18 @@ public class MyCalculator {
             //2 若为运算符，栈空则直接入栈 || 3 若为运算符，栈顶为"(" 则直接入栈
             if (theCharStack.isEmpty() || theCharStack.peek() == '(')
                 theCharStack.push(theString.charAt(0));
-                // 若为运算符，栈顶元素优先级大于此运算符，则取数字栈的两个数字
+                // 若为运算符，栈顶元素优先级大于或等于此运算符，则取数字栈的两个数字
                 // 与栈顶的运算符号进行计算，重新压入数字栈，符号栈出栈，
-                // 直到遇到"("或者优先级小于或等于此运算符的栈顶元素为止
-            else if (theString.charAt(0) == '+' || theString.charAt(0) == '-') {
-                while (!theCharStack.isEmpty() && (theCharStack.peek() == '*'
-                        || theCharStack.peek() == '/')) {
+                // 直到遇到"("或者优先级小于此运算符的栈顶元素为止
+            else if (getPriority(theString.charAt(0)) <= getPriority(theCharStack.peek())) {
+                while (!theCharStack.isEmpty() &&
+                        getPriority(theString.charAt(0)) <= getPriority(theCharStack.peek())) {
                     double b = theDoubleStack.pop();
                     double a = theDoubleStack.pop();
                     theDoubleStack.push(BinaryOperation(a, b, theCharStack.pop()));
                 }
                 theCharStack.push(theString.charAt(0));
-            }else if(theString.charAt(0) == '*' || theString.charAt(0) == '/'){
+            } else if (getPriority(theString.charAt(0)) > getPriority(theCharStack.peek())) {
                 theCharStack.push(theString.charAt(0));
             }
         } else if (theString.equals(")")) {
@@ -103,7 +114,7 @@ public class MyCalculator {
         }
     }
 
-    private static void EmptyTheStack(char ch){
+    private static void EmptyTheStack(char ch) {
         double b = theDoubleStack.pop();
         double a = theDoubleStack.pop();
         theDoubleStack.push(BinaryOperation(a, b, ch));
